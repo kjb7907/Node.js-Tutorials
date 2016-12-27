@@ -1,0 +1,9 @@
+html
+  head
+    title= title
+  body
+    h1 hello jade
+    ul
+      -for(var i =0; i<5;i++) //-를 붙여줘야 jade엔진에서 for문이 동작한다.
+        li coding
+    div= time
