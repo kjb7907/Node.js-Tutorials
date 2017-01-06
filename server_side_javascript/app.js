@@ -2,7 +2,7 @@ var express = require('express');
 var app = express();
 var bodyParser = require('body-parser'); //post방식 데이터를 사용하게해주는 bodyParser 모듈 로드
 
-app.use(bodyParser.urlded({ extended: true })); //bodyParser모듈을 애플리케이션 객체에 붙이는코드
+app.use(bodyParser.urlencoded({ extended: true })); //bodyParser모듈을 애플리케이션 객체에 붙이는코드
 
 app.locals.pretty = true; //템플릿 엔진 코드에 들여쓰기 적용해주는 코드
 app.set('view engine','jade'); //템플릿 엔진을 세팅하고 express와 연결하는 코드

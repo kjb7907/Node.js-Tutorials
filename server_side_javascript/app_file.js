@@ -1,12 +1,33 @@
 var express = require('express');
-var app = express();
 var fs = require('fs');
 var bodyParser = require('body-Parser');
+var multer = require('multer');
+var storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, 'uploads/') //경로
+  },
+  filename: function (req, file, cb) {
+    cb(null, file.originalname)
+  }
+})
+var upload = multer({ storage: storage });
+
+var app = express();
 
 app.use(bodyParser.urlencoded({ extended : true}));
 app.locals.pretty = true;
 app.set('views','views_file');
 app.set('view engine','jade');
+
+app.get('/upload',function(req,res){
+  console.log('upload GET')
+  res.render('upload');
+});
+app.post('/upload',upload.single('userfile'),function(req,res){
+  console.log('upload POST')
+  console.log(req.file);
+  res.send('uploaded : '+req.file.filename)
+});
 
 app.get('/topic/new',function(req,res){
   res.render('new');
