@@ -39,7 +39,7 @@ app.post('/upload', upload.single('userfile'), function(req, res){
 });
 
 //글목록
-app.get(['/list', '/list/:boardNo'], function(req, res){ //글목록&글상세페이지 시멘틱 url
+app.get(['/board/list', '/board/list/:boardNo'], function(req, res){ //글목록&글상세페이지 시멘틱 url
   var sql = 'SELECT board_no,board_title FROM board';
   conn.query(sql, function(err, boards, fields){ //쿼리문실행&쿼리문실행후 실행되는 콜백함수
     var boardNo = req.params.boardNo; //시멘틱 url로 넘어온 boardNo 변수에 저장
@@ -59,32 +59,86 @@ app.get(['/list', '/list/:boardNo'], function(req, res){ //글목록&글상세�
   });
 });
 
-//글입력
-app.get('/topic/add', function(req, res){
-  var sql = 'SELECT id,title FROM topic';
-  conn.query(sql, function(err, topics, fields){
-    if(err){
-      console.log(err);
-      res.status(500).send('Internal Server Error'); //에러응답
+//글 상세보기
+app.get(['/board/view', '/board/view/:boardNo'], function(req, res){
+  var sql = 'SELECT board_no,board_title FROM board';
+   conn.query(sql, function(err, boards, fields){
+    var boardNo = req.params.boardNo;
+    if(boardNo){
+      var sql = 'SELECT * FROM board WHERE board_no=?';
+      conn.query(sql, [boardNo], function(err, board, fields){
+        if(err){
+          console.log(err);
+          res.status(500).send('Internal Server Error');
+        } else {
+          res.render('view', {boards:boards,board:board[0]});
+        }
+      });
+    } else {
+      res.render('view', {boards:boards});
     }
-    res.render('add', {topics:topics});
   });
 });
-//글입력
-app.post('/topic/add', function(req, res){
-  var title = req.body.title;
-  var description = req.body.description;
-  var author = req.body.author;
-  var sql = 'INSERT INTO topic (title, description, author) VALUES(?, ?, ?)';
-  conn.query(sql, [title, description, author], function(err, result, fields){
+
+//글입력 폼
+app.get('/board/add', function(req, res){
+    res.render('add');
+});
+
+//글입력 처리
+app.post('/board/add', function(req, res){
+  var boardTitle = req.body.boardTitle;
+  var boardContent = req.body.boardContent;
+  var boardUser = req.body.boardUser;
+  var boardPw = req.body.boardPw;
+  var sql = 'INSERT INTO board (board_title, board_content,board_User, board_pw,board_date) VALUES(?, ?, ?, ?, now())';
+  conn.query(sql, [boardTitle, boardContent,boardUser, boardPw], function(err, result, fields){
     if(err){
       console.log(err);
       res.status(500).send('Internal Server Error');
     } else {
-      res.redirect('/topic/'+result.insertId);
+      res.redirect('board/list'+result.insertId);
     }
   });
 });
+
+//업데이트 폼
+app.get(['/board/:boardNo/edit'], function(req, res){
+    var boardNo = req.params.boardNo;
+    if(boardNo){
+      var sql = 'SELECT * FROM board WHERE board_no=?';
+      conn.query(sql, [boardNo], function(err, board, fields){
+        if(err){
+          console.log(err);
+          res.status(500).send('Internal Server Error');
+        } else {
+          res.render('edit', {board:board[0]});
+        }
+      });
+    } else {
+      console.log('There is no id.');
+      res.status(500).send('Internal Server Error');
+    }
+
+});
+
+//업데이트 처리
+app.post(['/board/:boardNo/edit'], function(req, res){
+  var boardTitle = req.body.boardTitle;
+  var boardContent = req.body.boardContent;
+  var boardUser = req.body.boardUser;
+  var boardNo = req.params.boardNo;
+  var sql = 'UPDATE board SET board_title=?, board_content=?, board_User=? WHERE board_no=?';
+  conn.query(sql, [boardTitle, boardContent, boardUser, boardNo], function(err, result, fields){
+    if(err){
+      console.log(err);
+      res.status(500).send('Internal Server Error');
+    } else {
+      res.redirect('/board/view/'+boardNo);
+    }
+  });
+});
+
 
 
 //포트 리스닝

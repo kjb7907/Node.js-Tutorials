@@ -1,0 +1,19 @@
+doctype html
+html
+  head
+    meta(charset='utf-8')
+  body
+    artcle
+      form(action='/board/'+board.board_no+'/edit' method='post')
+        p
+          input(type='text' name='boardTitle' value=board.board_title placeholder='title')
+        p
+          textarea(name='boardContent' placeholder='description')
+            =board.board_content
+        p
+          input(type='text' name='boardUser' value=board.board_user placeholder='author')
+        p
+          input(type='submit')
+    ul
+      li
+        a(href='/topic/add') add

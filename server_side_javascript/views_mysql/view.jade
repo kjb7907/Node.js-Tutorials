@@ -8,7 +8,7 @@ html
     ul
       each board in boards
         li
-          a(href='/list/'+board.board_no)= board.board_title
+          a(href='/board/view/'+board.board_no)= board.board_title
     artcle
       if board
         h2= board.board_title
@@ -20,7 +20,7 @@ html
     ul
       li
         a(href='/board/add') add
-      if topic
+      if board
         li
           a(href='/board/'+board.board_no+'/edit') edit
         li
